@@ -1,0 +1,32 @@
+{
+  "outfits": [
+    {"id": "outfit_default", "name": "Classic", "price": 0, "image": "assets/images/outfits/classic.png"},
+    {"id": "outfit_fairy", "name": "Fairy", "price": 50, "image": "assets/images/outfits/fairy.png"},
+    {"id": "outfit_knight", "name": "Knight", "price": 80, "image": "assets/images/outfits/knight.png"},
+    {"id": "outfit_mage", "name": "Mage", "price": 120, "image": "assets/images/outfits/mage.png"},
+    {"id": "outfit_ninja", "name": "Ninja", "price": 150, "image": "assets/images/outfits/ninja.png"},
+    {"id": "outfit_explorer", "name": "Explorer", "price": 100, "image": "assets/images/outfits/explorer.png"},
+    {"id": "outfit_royal", "name": "Royal Gold", "price": 200, "image": "assets/images/outfits/royal.png"},
+    {"id": "outfit_star", "name": "Starlight", "price": 180, "image": "assets/images/outfits/star.png"}
+  ],
+  "accessories": [
+    {"id": "acc_none", "name": "None", "price": 0, "image": ""},
+    {"id": "acc_crown", "name": "Crown", "price": 30, "image": "assets/images/accessories/crown.png"},
+    {"id": "acc_hat", "name": "Wizard Hat", "price": 40, "image": "assets/images/accessories/hat.png"},
+    {"id": "acc_wings", "name": "Wings", "price": 60, "image": "assets/images/accessories/wings.png"},
+    {"id": "acc_shield", "name": "Shield", "price": 50, "image": "assets/images/accessories/shield.png"},
+    {"id": "acc_wand", "name": "Magic Wand", "price": 45, "image": "assets/images/accessories/wand.png"},
+    {"id": "acc_bow", "name": "Bow & Arrow", "price": 70, "image": "assets/images/accessories/bow.png"},
+    {"id": "acc_lantern", "name": "Lantern", "price": 35, "image": "assets/images/accessories/lantern.png"}
+  ],
+  "companions": [
+    {"id": "comp_none", "name": "None", "price": 0, "image": ""},
+    {"id": "comp_fox", "name": "Fox", "price": 100, "image": "assets/images/companions/fox.png"},
+    {"id": "comp_owl", "name": "Owl", "price": 120, "image": "assets/images/companions/owl.png"},
+    {"id": "comp_bunny", "name": "Bunny", "price": 80, "image": "assets/images/companions/bunny.png"},
+    {"id": "comp_dragon", "name": "Baby Dragon", "price": 250, "image": "assets/images/companions/dragon.png"},
+    {"id": "comp_cat", "name": "Magic Cat", "price": 90, "image": "assets/images/companions/cat.png"},
+    {"id": "comp_fairy", "name": "Fairy", "price": 150, "image": "assets/images/companions/fairy.png"},
+    {"id": "comp_wolf", "name": "Wolf Pup", "price": 130, "image": "assets/images/companions/wolf.png"}
+  ]
+}
