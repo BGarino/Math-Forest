@@ -1,6 +1,7 @@
 """
-Maze Screen - renders the procedural maze, character movement,
-animal encounters, companion display, and gate opening.
+Maze Screen - the main gameplay screen.
+Shows the procedurally generated maze, the character,
+animals as obstacles, and the companion.
 """
 from kivy.uix.screenmanager import Screen
 from kivy.uix.floatlayout import FloatLayout
@@ -11,31 +12,77 @@ from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.metrics import dp
 from kivy.app import App
-from kivy.core.window import Window
+from kivy.vector import Vector
+import random
 
 from logic.maze_gen import MazeGenerator
 from logic.question_gen import QuestionGenerator
 from logic.reward_system import RewardSystem
 from data.lang import get_text
-from data.levels_config import get_theme_for_level, get_animals_for_level, ANIMALS_PER_SET
-import random
+from data.levels_config import get_theme_for_level, get_animals_for_level, diamonds_for_level
 
-CELL = dp(36)
 
-THEME_COLORS = {
-    'forest':     {'wall': (0.10, 0.35, 0.10, 1), 'path': (0.55, 0.80, 0.40, 1), 'bg': (0.07, 0.22, 0.07, 1)},
-    'cave':       {'wall': (0.18, 0.14, 0.10, 1), 'path': (0.45, 0.38, 0.28, 1), 'bg': (0.10, 0.08, 0.05, 1)},
-    'clearing':   {'wall': (0.30, 0.55, 0.15, 1), 'path': (0.85, 0.95, 0.60, 1), 'bg': (0.50, 0.75, 0.25, 1)},
-    'night':      {'wall': (0.05, 0.05, 0.18, 1), 'path': (0.15, 0.15, 0.40, 1), 'bg': (0.02, 0.02, 0.12, 1)},
-    'underwater': {'wall': (0.03, 0.20, 0.50, 1), 'path': (0.20, 0.60, 0.85, 1), 'bg': (0.02, 0.12, 0.35, 1)},
-    'volcano':    {'wall': (0.45, 0.10, 0.02, 1), 'path': (0.80, 0.35, 0.05, 1), 'bg': (0.25, 0.05, 0.02, 1)},
-    'snow':       {'wall': (0.55, 0.70, 0.80, 1), 'path': (0.90, 0.95, 1.00, 1), 'bg': (0.65, 0.80, 0.90, 1)},
-    'cloud':      {'wall': (0.55, 0.70, 0.90, 1), 'path': (0.90, 0.95, 1.00, 1), 'bg': (0.60, 0.80, 1.00, 1)},
-    'desert':     {'wall': (0.70, 0.50, 0.15, 1), 'path': (0.95, 0.85, 0.55, 1), 'bg': (0.80, 0.65, 0.25, 1)},
-    'haunted':    {'wall': (0.10, 0.05, 0.15, 1), 'path': (0.25, 0.12, 0.35, 1), 'bg': (0.06, 0.03, 0.10, 1)},
-}
+CELL = dp(32)
 
-ANIMAL_EMOJIS = ['🐰','🦊','🦌','🐻','🦉','🐺','🐿','🦔','🦝','🦫','🦦','🦨','🫎','🐱','🦅']
+ANIMAL_EMOJIS = [
+    '🦊','🐺','🦌','🐻','🦉','🐰','🐿','🦔','🦝','🦫',
+    '🦦','🐸','🐢','🦋','🐝','🦎','🐍','🦜','🐧','🦈',
+]
+
+
+class CharacterSprite(Label):
+    def __init__(self, gender='princess', **kwargs):
+        super().__init__(**kwargs)
+        self.gender = gender
+        self.font_size = dp(28)
+        self.size_hint = (None, None)
+        self.size = (CELL, CELL)
+        self._update_emoji()
+
+    def _update_emoji(self):
+        self.text = '👸' if self.gender == 'princess' else '🤴'
+
+    def move_to(self, gx, gy, maze_origin):
+        ox, oy = maze_origin
+        target_x = ox + gx * CELL
+        target_y = oy + gy * CELL
+        anim = Animation(x=target_x, y=target_y, duration=0.18)
+        anim.start(self)
+
+
+class AnimalSprite(Label):
+    def __init__(self, gx, gy, emoji, maze_origin, **kwargs):
+        super().__init__(**kwargs)
+        self.gx = gx
+        self.gy = gy
+        self.emoji = emoji
+        self.text = emoji
+        self.font_size = dp(24)
+        self.size_hint = (None, None)
+        self.size = (CELL, CELL)
+        ox, oy = maze_origin
+        self.pos = (ox + gx * CELL, oy + gy * CELL)
+        self.defeated = False
+
+    def defeat(self):
+        self.defeated = True
+        anim = Animation(font_size=dp(36), opacity=0, duration=0.5)
+        anim.bind(on_complete=lambda *_: self.parent.remove_widget(self) if self.parent else None)
+        anim.start(self)
+
+
+class CompanionSprite(Label):
+    def __init__(self, companion_id, **kwargs):
+        super().__init__(**kwargs)
+        COMPANION_EMOJIS = {
+            'comp_fox': '🦊', 'comp_owl': '🦉', 'comp_bunny': '🐰',
+            'comp_dragon': '🐉', 'comp_cat': '🐱', 'comp_fairy': '🧚',
+            'comp_wolf': '🐺', 'comp_none': ''
+        }
+        self.text = COMPANION_EMOJIS.get(companion_id, '')
+        self.font_size = dp(22)
+        self.size_hint = (None, None)
+        self.size = (dp(36), dp(36))
 
 
 class MazeScreen(Screen):
@@ -43,362 +90,247 @@ class MazeScreen(Screen):
         super().__init__(**kwargs)
         self._root = FloatLayout()
         self.add_widget(self._root)
-        self._maze_gen = None
-        self._grid = []
+        self._char = None
+        self._animals = []
         self._char_pos = [1, 1]
-        self._animals_remaining = set()
-        self._animals_done = set()
-        self._question_active = False
-        self._current_animal = None
-        self._correct = 0
-        self._total = 0
+        self._pending_animal = None
 
     def on_enter(self):
         self._root.clear_widgets()
-        self._setup_level()
-
-    def _setup_level(self):
-        app = App.get_running_app()
-        self._level = getattr(app, '_selected_level', 1)
-        self._save = app.save
-        self._lang = self._save.get('language', 'en')
-        self._age = self._save.get('age_group', '8-10')
-        self._theme = get_theme_for_level(self._level)
-        self._colors = THEME_COLORS.get(self._theme['id'], THEME_COLORS['forest'])
-        self._question_gen = QuestionGenerator(self._age)
-        self._correct = 0
-        self._total = 0
-        self._animals_done = set()
-
-        mg = MazeGenerator(level=self._level)
-        self._grid = mg.generate()
-        self._maze_w = mg.width
-        self._maze_h = mg.height
-        self._animal_positions = set(map(tuple, mg.animal_positions))
-        self._animals_remaining = set(map(tuple, mg.animal_positions))
+        self._animals = []
         self._char_pos = [1, 1]
-        self._question_active = False
+        self._build()
 
-        self._draw_all()
-
-    def _draw_all(self):
+    def _build(self):
+        app = App.get_running_app()
+        save = app.save
+        lang = save.get('language', 'en')
+        level = getattr(app, '_selected_level', 1)
+        age_group = save.get('age_group', '8-10')
+        gender = save.get('gender', 'princess')
+        companion_id = save.get('equipped_companion', 'comp_none')
+        theme = get_theme_for_level(level)
         root = self._root
-        root.clear_widgets()
-        root.canvas.before.clear()
 
-        bg = self._colors['bg']
+        # Background
         with root.canvas.before:
-            Color(*bg)
-            self._bg_rect = Rectangle(pos=root.pos, size=root.size)
+            Color(*theme['bg_color'])
+            self._bg = Rectangle(pos=root.pos, size=root.size)
         root.bind(size=self._on_resize, pos=self._on_resize)
 
         # HUD
+        self._lives = 3
+        self._correct = 0
+        self._total = 0
+        self._level = level
+        self._lang = lang
+        self._age_group = age_group
+
         self._hud_lbl = Label(
             text=self._hud_text(),
-            markup=True,
             font_size=dp(14),
             color=(1, 1, 1, 1),
-            size_hint=(1, None),
-            height=dp(36),
-            pos_hint={'center_x': 0.5, 'top': 1.0}
+            size_hint=(1, None), height=dp(36),
+            pos_hint={'center_x': 0.5, 'top': 1.0},
+            halign='center'
         )
         root.add_widget(self._hud_lbl)
 
-        # Maze canvas widget
-        self._maze_widget = FloatLayout(
-            size_hint=(None, None),
-            size=(self._maze_w * CELL, self._maze_h * CELL),
-        )
-        self._maze_widget.pos_hint = {'center_x': 0.5, 'center_y': 0.50}
-        root.add_widget(self._maze_widget)
-        self._draw_maze()
-
-        # D-pad
-        self._add_dpad()
-
-        # Back
+        # Back button
         back = Button(
-            text='🏠', font_size=dp(20),
-            background_normal='', background_color=(0.3,0.3,0.3,0.8),
-            size_hint=(None,None), size=(dp(44),dp(44)),
-            pos_hint={'x':0.02,'top':0.99}
+            text=get_text(lang, 'home'),
+            font_size=dp(13),
+            background_normal='', background_color=(0.3, 0.3, 0.3, 0.9),
+            size_hint=(None, None), size=(dp(70), dp(32)),
+            pos_hint={'x': 0.02, 'top': 1.0}
         )
-        back.bind(on_release=lambda *_: setattr(self.manager,'current','main_menu'))
+        back.bind(on_release=lambda *_: setattr(self.manager, 'current', 'main_menu'))
         root.add_widget(back)
 
-        # Companion
-        comp_id = self._save.get('equipped_companion','comp_none')
-        if comp_id != 'comp_none':
-            comp_emojis = {'comp_fox':'🦊','comp_owl':'🦉','comp_bunny':'🐰',
-                           'comp_dragon':'🐲','comp_cat':'🐱','comp_fairy':'🧚','comp_wolf':'🐺'}
-            comp_lbl = Label(
-                text=comp_emojis.get(comp_id,'🐾'),
-                font_size=dp(36),
-                size_hint=(None,None), size=(dp(50),dp(50)),
-                pos_hint={'right':0.95,'y':0.18}
-            )
-            root.add_widget(comp_lbl)
-            # Idle bob
-            bob = Animation(pos_hint={'right':0.95,'y':0.20},duration=1.0) + \
-                  Animation(pos_hint={'right':0.95,'y':0.18},duration=1.0)
-            bob.repeat = True
-            bob.start(comp_lbl)
+        # Generate maze
+        gen = MazeGenerator(level=level)
+        self._grid = gen.generate()
+        self._maze_w = gen.width
+        self._maze_h = gen.height
+        self._animal_positions = list(gen.animal_positions)
 
-    def _draw_maze(self):
-        mw = self._maze_widget
-        mw.canvas.clear()
-        wall_c = self._colors['wall']
-        path_c = self._colors['path']
-        with mw.canvas:
-            for y in range(self._maze_h):
-                for x in range(self._maze_w):
-                    cell = self._grid[y][x]
-                    if cell == MazeGenerator.WALL:
-                        Color(*wall_c)
-                    else:
-                        Color(*path_c)
-                    Rectangle(pos=(x*CELL, (self._maze_h-1-y)*CELL),
-                               size=(CELL, CELL))
-                    # Animal
-                    if cell == MazeGenerator.ANIMAL and (x,y) in self._animals_remaining:
-                        Color(1,1,1,1)
-                    # End gate
-                    if cell == MazeGenerator.END:
-                        Color(0.9,0.7,0.1,1)
-                        Rectangle(pos=(x*CELL+dp(4),(self._maze_h-1-y)*CELL+dp(4)),
-                                  size=(CELL-dp(8),CELL-dp(8)))
+        # Question generator
+        self._qgen = QuestionGenerator(age_group)
 
-        # Animal labels
-        animals = get_animals_for_level(self._level)
-        for idx, (ax, ay) in enumerate(self._animals_remaining):
-            emoji = ANIMAL_EMOJIS[idx % len(ANIMAL_EMOJIS)]
-            lbl = Label(
-                text=emoji, font_size=dp(22),
-                size_hint=(None,None), size=(CELL,CELL),
-                pos=(ax*CELL, (self._maze_h-1-ay)*CELL)
-            )
-            mw.add_widget(lbl)
+        # Draw maze
+        maze_pixel_w = self._maze_w * CELL
+        maze_pixel_h = self._maze_h * CELL
+        ox = (root.width - maze_pixel_w) / 2
+        oy = (root.height - maze_pixel_h) / 2 + dp(20)
+        self._maze_origin = (ox, oy)
+        self._draw_maze(ox, oy)
 
         # Character
-        cx, cy = self._char_pos
-        gender = self._save.get('gender','princess')
-        char_emoji = '👸' if gender == 'princess' else '🤴'
-        self._char_lbl = Label(
-            text=char_emoji, font_size=dp(26),
-            size_hint=(None,None), size=(CELL,CELL),
-            pos=(cx*CELL, (self._maze_h-1-cy)*CELL)
-        )
-        mw.add_widget(self._char_lbl)
+        self._char = CharacterSprite(gender=gender)
+        self._char.pos = (ox + CELL, oy + CELL)
+        root.add_widget(self._char)
+
+        # Animals
+        animal_list = get_animals_for_level(level)
+        for i, (ax, ay) in enumerate(self._animal_positions):
+            emoji = ANIMAL_EMOJIS[i % len(ANIMAL_EMOJIS)]
+            sprite = AnimalSprite(ax, ay, emoji, (ox, oy))
+            self._animals.append(sprite)
+            root.add_widget(sprite)
+
+        # Companion
+        if companion_id != 'comp_none':
+            comp = CompanionSprite(companion_id)
+            comp.pos_hint = {'right': 0.98, 'y': 0.02}
+            root.add_widget(comp)
+
+        # D-pad controls
+        self._add_dpad()
+
+    def _draw_maze(self, ox, oy):
+        root = self._root
+        with root.canvas:
+            for row in range(self._maze_h):
+                for col in range(self._maze_w):
+                    cell = self._grid[row][col]
+                    cx = ox + col * CELL
+                    cy = oy + row * CELL
+                    if cell == MazeGenerator.WALL:
+                        Color(0.1, 0.1, 0.1, 1)
+                        Rectangle(pos=(cx, cy), size=(CELL, CELL))
+                    elif cell == MazeGenerator.END:
+                        Color(0.9, 0.7, 0.1, 1)
+                        Rectangle(pos=(cx, cy), size=(CELL, CELL))
+                        Color(1, 1, 1, 1)
+                    elif cell in (MazeGenerator.PATH, MazeGenerator.ANIMAL,
+                                   MazeGenerator.START):
+                        Color(0.85, 0.80, 0.65, 0.25)
+                        Rectangle(pos=(cx, cy), size=(CELL, CELL))
 
     def _add_dpad(self):
         root = self._root
-        dirs = [
-            ('⬆', ( 0,-1), {'center_x':0.50,'top':0.22}),
-            ('⬇', ( 0, 1), {'center_x':0.50,'top':0.13}),
-            ('⬅', (-1, 0), {'center_x':0.35,'top':0.175}),
-            ('➡', ( 1, 0), {'center_x':0.65,'top':0.175}),
+        dpad_data = [
+            ('▲', (0, 1),  {'center_x': 0.5, 'top': 0.22}),
+            ('▼', (0, -1), {'center_x': 0.5, 'top': 0.10}),
+            ('◀', (-1, 0), {'center_x': 0.35, 'top': 0.16}),
+            ('▶', (1, 0),  {'center_x': 0.65, 'top': 0.16}),
         ]
-        for label, delta, ph in dirs:
+        for symbol, direction, ph in dpad_data:
             btn = Button(
-                text=label, font_size=dp(24),
-                background_normal='', background_color=(0.15,0.15,0.15,0.85),
-                size_hint=(None,None), size=(dp(52),dp(52)),
+                text=symbol, font_size=dp(26), bold=True,
+                background_normal='', background_color=(0.2, 0.6, 0.2, 0.85),
+                size_hint=(None, None), size=(dp(54), dp(54)),
                 pos_hint=ph
             )
-            btn.bind(on_release=lambda b, d=delta: self._move(d))
+            btn.bind(on_release=self._make_move(direction))
             root.add_widget(btn)
 
-    def _move(self, delta):
-        if self._question_active:
-            return
-        dx, dy = delta
-        nx = self._char_pos[0] + dx
-        ny = self._char_pos[1] + dy
-        if 0 <= nx < self._maze_w and 0 <= ny < self._maze_h:
-            cell = self._grid[ny][nx]
-            if cell != MazeGenerator.WALL:
-                self._char_pos = [nx, ny]
-                # Animate
-                if self._char_lbl:
-                    anim = Animation(
-                        pos=(nx*CELL,(self._maze_h-1-ny)*CELL),
-                        duration=0.15
-                    )
-                    anim.start(self._char_lbl)
-                # Check animal
-                if (nx, ny) in self._animals_remaining:
-                    Clock.schedule_once(lambda dt: self._trigger_question(nx,ny), 0.2)
-                # Check end
-                elif cell == MazeGenerator.END:
-                    if not self._animals_remaining:
-                        Clock.schedule_once(lambda dt: self._level_complete(), 0.3)
+    def _make_move(self, direction):
+        def move(*_):
+            dx, dy = direction
+            nx = self._char_pos[0] + dx
+            ny = self._char_pos[1] + dy
+            if 0 <= nx < self._maze_w and 0 <= ny < self._maze_h:
+                cell = self._grid[ny][nx]
+                if cell != MazeGenerator.WALL:
+                    self._char_pos = [nx, ny]
+                    self._char.move_to(nx, ny, self._maze_origin)
+                    self._check_cell(nx, ny, cell)
+        return move
 
-    def _trigger_question(self, ax, ay):
-        self._question_active = True
-        self._current_animal = (ax, ay)
-        q = self._question_gen.generate(level=self._level)
-        self._show_question_popup(q, ax, ay)
+    def _check_cell(self, cx, cy, cell):
+        if cell == MazeGenerator.END:
+            self._level_complete()
+        elif cell == MazeGenerator.ANIMAL:
+            for animal in self._animals:
+                if animal.gx == cx and animal.gy == cy and not animal.defeated:
+                    self._pending_animal = animal
+                    self._show_question()
+                    break
 
-    def _show_question_popup(self, q, ax, ay):
-        root = self._root
-        # Dim overlay
-        overlay = FloatLayout(
-            size_hint=(1,1),
-            pos_hint={'center_x':0.5,'center_y':0.5}
-        )
-        with overlay.canvas.before:
-            Color(0,0,0,0.65)
-            Rectangle(pos=(0,0), size=Window.size)
+    def _show_question(self):
+        app = App.get_running_app()
+        level = getattr(app, '_selected_level', 1)
+        q = self._qgen.generate(level=level)
+        app._pending_question = q
+        app._maze_callback = self._on_answer
+        self.manager.current = 'game'
 
-        lang = self._lang
-        # Card
-        card = FloatLayout(
-            size_hint=(0.85, None),
-            height=dp(320),
-            pos_hint={'center_x':0.5,'center_y':0.55}
-        )
-        with card.canvas.before:
-            Color(0.12, 0.28, 0.12, 1)
-            RoundedRectangle(pos=card.pos, size=card.size, radius=[dp(18)])
-        card.bind(pos=lambda w,*_: self._redraw_card(w),
-                  size=lambda w,*_: self._redraw_card(w))
-        self._card_widget = card
-
-        animals = get_animals_for_level(self._level)
-        idx = list(self._animals_remaining).index((ax,ay)) if (ax,ay) in self._animals_remaining else 0
-        emoji = ANIMAL_EMOJIS[idx % len(ANIMAL_EMOJIS)]
-
-        card.add_widget(Label(
-            text=emoji, font_size=dp(48),
-            size_hint=(None,None), size=(dp(70),dp(70)),
-            pos_hint={'center_x':0.5,'top':0.98}
-        ))
-        card.add_widget(Label(
-            text=f'[b]{q["question"]}[/b]', markup=True,
-            font_size=dp(18), color=(1,1,0.7,1),
-            size_hint=(1, None), height=dp(60),
-            pos_hint={'center_x':0.5,'top':0.72},
-            text_size=(dp(280),None), halign='center'
-        ))
-
-        # Choices
-        choice_tops = [0.52, 0.40, 0.28, 0.16]
-        for ch, ct in zip(q['choices'], choice_tops):
-            cbtn = Button(
-                text=str(ch), font_size=dp(16), bold=True,
-                background_normal='', background_color=(0.20,0.55,0.25,1),
-                size_hint=(0.75, None), height=dp(40),
-                pos_hint={'center_x':0.5,'top':ct}
-            )
-            cbtn.bind(on_release=lambda b, ans=str(q['answer']), chosen=str(ch): \
-                      self._answer(ans, chosen, ax, ay))
-            card.add_widget(cbtn)
-
-        overlay.add_widget(card)
-        root.add_widget(overlay)
-        self._question_overlay = overlay
-
-        # Entrance animation
-        card.opacity = 0
-        Animation(opacity=1, duration=0.3).start(card)
-
-    def _redraw_card(self, w):
-        w.canvas.before.clear()
-        with w.canvas.before:
-            Color(0.12, 0.28, 0.12, 1)
-            RoundedRectangle(pos=w.pos, size=w.size, radius=[dp(18)])
-
-    def _answer(self, correct, chosen, ax, ay):
+    def _on_answer(self, correct: bool):
         self._total += 1
-        lang = self._lang
-        if chosen == correct:
+        if correct:
             self._correct += 1
-            self._animals_remaining.discard((ax, ay))
-            self._animals_done.add((ax, ay))
-            # Award card
-            animals = get_animals_for_level(self._level)
-            theme_idx = (self._level-1)//30
-            card_id = f'set{theme_idx+1}_{ax}_{ay}'
-            self._save.add_card(card_id)
-            feedback = get_text(lang, 'correct')
-            fb_color = (0.2, 0.9, 0.2, 1)
+            if self._pending_animal:
+                self._pending_animal.defeat()
+                self._grid[self._pending_animal.gy][self._pending_animal.gx] = MazeGenerator.PATH
+                self._pending_animal = None
         else:
-            feedback = get_text(lang, 'wrong')
-            fb_color = (0.9, 0.2, 0.2, 1)
-
-        # Show feedback then close
-        if self._question_overlay:
-            lbl = Label(
-                text=feedback, font_size=dp(22), bold=True,
-                color=fb_color,
-                size_hint=(1,None), height=dp(50),
-                pos_hint={'center_x':0.5,'center_y':0.5}
-            )
-            self._question_overlay.add_widget(lbl)
-            def _close(dt):
-                self._root.remove_widget(self._question_overlay)
-                self._question_overlay = None
-                self._question_active = False
-                self._hud_lbl.text = self._hud_text()
-                self._draw_maze()
-            Clock.schedule_once(_close, 1.0)
+            self._lives -= 1
+            if self._lives <= 0:
+                self._game_over()
+                return
+        self._hud_lbl.text = self._hud_text()
 
     def _hud_text(self):
-        lang = self._lang
-        remaining = len(self._animals_remaining)
-        done = len(self._animals_done)
-        diamonds = self._save.get('diamonds', 0)
-        return (f'[b]{get_text(lang,"level")} {self._level}[/b]  '
-                f'🐾 {done}/{done+remaining}  💎 {diamonds}')
+        lang = getattr(self, '_lang', 'en')
+        lives_str = '❤️' * getattr(self, '_lives', 3)
+        lvl = getattr(self, '_level', 1)
+        score = getattr(self, '_correct', 0)
+        return f'{get_text(lang, "level")} {lvl}   {lives_str}   ⭐ {score}'
 
     def _level_complete(self):
-        lang = self._lang
-        diamonds = RewardSystem.calculate(
-            self._level, self._correct, max(self._total,1)
+        app = App.get_running_app()
+        level = getattr(app, '_selected_level', 1)
+        correct = getattr(self, '_correct', 0)
+        total = getattr(self, '_total', 1)
+        diamonds = RewardSystem.calculate(level, correct, max(total, 1))
+        stars = RewardSystem.stars(correct, max(total, 1))
+        app.save.complete_level(level, stars)
+        app.save.add_diamonds(diamonds)
+        # Show completion popup
+        lang = getattr(self, '_lang', 'en')
+        self._show_popup(
+            f'{get_text(lang, "level_complete")}\n'
+            f'💎 +{diamonds}  ⭐ {stars}/3',
+            on_ok=lambda: setattr(self.manager, 'current', 'level_select')
         )
-        stars = RewardSystem.stars(self._correct, max(self._total,1))
-        self._save.add_diamonds(diamonds)
-        self._save.complete_level(self._level, stars)
 
-        overlay = FloatLayout(size_hint=(1,1))
+    def _game_over(self):
+        lang = getattr(self, '_lang', 'en')
+        self._show_popup(
+            '💀 Game Over!',
+            on_ok=lambda: self.on_enter()
+        )
+
+    def _show_popup(self, message, on_ok=None):
+        root = self._root
+        overlay = FloatLayout(size_hint=(1, 1), pos_hint={'x': 0, 'y': 0})
         with overlay.canvas.before:
-            Color(0,0,0,0.75)
-            Rectangle(pos=(0,0), size=Window.size)
-
-        overlay.add_widget(Label(
-            text=f'[b]{get_text(lang,"level_complete")}[/b]\n'
-                 f'{get_text(lang,"gate_open")}\n'
-                 f'💎 +{diamonds}  ⭐{"★"*stars}',
-            markup=True, font_size=dp(22),
-            color=(1,1,0.5,1),
-            size_hint=(0.8,None), height=dp(160),
-            pos_hint={'center_x':0.5,'center_y':0.60},
+            Color(0, 0, 0, 0.65)
+            Rectangle(pos=overlay.pos, size=overlay.size)
+        lbl = Label(
+            text=f'[b]{message}[/b]', markup=True,
+            font_size=dp(22), color=(1, 1, 0.5, 1),
+            size_hint=(0.8, None), height=dp(100),
+            pos_hint={'center_x': 0.5, 'center_y': 0.58},
             halign='center'
-        ))
-
-        next_btn = Button(
-            text=get_text(lang,'next'), font_size=dp(18), bold=True,
-            background_normal='', background_color=(0.2,0.68,0.25,1),
-            size_hint=(0.5,None), height=dp(52),
-            pos_hint={'center_x':0.5,'center_y':0.38}
         )
-        def _go_next(*_):
-            self._root.remove_widget(overlay)
-            app = App.get_running_app()
-            app._selected_level = self._level + 1
-            self.on_enter()
-        next_btn.bind(on_release=_go_next)
-        overlay.add_widget(next_btn)
-
-        menu_btn = Button(
-            text=get_text(lang,'home'), font_size=dp(15),
-            background_normal='', background_color=(0.4,0.4,0.4,1),
-            size_hint=(0.4,None), height=dp(42),
-            pos_hint={'center_x':0.5,'center_y':0.28}
+        overlay.add_widget(lbl)
+        ok_btn = Button(
+            text='OK', font_size=dp(20),
+            background_normal='', background_color=(0.2, 0.7, 0.25, 1),
+            size_hint=(None, None), size=(dp(110), dp(50)),
+            pos_hint={'center_x': 0.5, 'center_y': 0.44}
         )
-        menu_btn.bind(on_release=lambda *_: setattr(self.manager,'current','main_menu'))
-        overlay.add_widget(menu_btn)
-        self._root.add_widget(overlay)
+        def _ok(*_):
+            root.remove_widget(overlay)
+            if on_ok:
+                on_ok()
+        ok_btn.bind(on_release=_ok)
+        overlay.add_widget(ok_btn)
+        root.add_widget(overlay)
 
     def _on_resize(self, *_):
-        self._bg_rect.size = self._root.size
+        root = self._root
+        self._bg.pos = root.pos
+        self._bg.size = root.size
