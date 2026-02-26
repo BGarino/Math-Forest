@@ -70,6 +70,8 @@ class TwinkleStar(Label):
 
 class MenuButton(Button):
     def __init__(self, **kwargs):
+        # Extract custom property BEFORE passing kwargs to super
+        self._color = kwargs.pop('btn_color', (0.2, 0.7, 0.3, 1))
         super().__init__(**kwargs)
         self.background_normal = ''
         self.background_color = (0, 0, 0, 0)
@@ -77,7 +79,6 @@ class MenuButton(Button):
         self.bold = True
         self.size_hint = (0.65, None)
         self.height = dp(52)
-        self._color = kwargs.pop('btn_color', (0.2, 0.7, 0.3, 1))
         self.bind(pos=self._draw, size=self._draw)
 
     def _draw(self, *_):
