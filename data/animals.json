@@ -1,0 +1,214 @@
+{
+  "sets": [
+    {
+      "id": 0,
+      "theme": "forest",
+      "animals": [
+        {"id": "set0_rabbit",    "name": "Rabbit",    "emoji": "🐰"},
+        {"id": "set0_fox",       "name": "Fox",       "emoji": "🦊"},
+        {"id": "set0_deer",      "name": "Deer",      "emoji": "🦌"},
+        {"id": "set0_bear",      "name": "Bear",      "emoji": "🐻"},
+        {"id": "set0_owl",       "name": "Owl",       "emoji": "🦉"},
+        {"id": "set0_wolf",      "name": "Wolf",      "emoji": "🐺"},
+        {"id": "set0_squirrel",  "name": "Squirrel",  "emoji": "🐿"},
+        {"id": "set0_hedgehog",  "name": "Hedgehog",  "emoji": "🦔"},
+        {"id": "set0_raccoon",   "name": "Raccoon",   "emoji": "🦝"},
+        {"id": "set0_beaver",    "name": "Beaver",    "emoji": "🦫"},
+        {"id": "set0_otter",     "name": "Otter",     "emoji": "🦦"},
+        {"id": "set0_skunk",     "name": "Skunk",     "emoji": "🦨"},
+        {"id": "set0_moose",     "name": "Moose",     "emoji": "🫎"},
+        {"id": "set0_lynx",      "name": "Lynx",      "emoji": "🐱"},
+        {"id": "set0_eagle",     "name": "Eagle",     "emoji": "🦅"}
+      ]
+    },
+    {
+      "id": 1,
+      "theme": "cave",
+      "animals": [
+        {"id": "set1_bat",            "name": "Bat",            "emoji": "🦇"},
+        {"id": "set1_mole",           "name": "Mole",           "emoji": "🐭"},
+        {"id": "set1_spider",         "name": "Spider",         "emoji": "🕷"},
+        {"id": "set1_scorpion",       "name": "Scorpion",       "emoji": "🦂"},
+        {"id": "set1_snake",          "name": "Snake",          "emoji": "🐍"},
+        {"id": "set1_lizard",         "name": "Lizard",         "emoji": "🦎"},
+        {"id": "set1_toad",           "name": "Toad",           "emoji": "🐸"},
+        {"id": "set1_worm",           "name": "Worm",           "emoji": "🪱"},
+        {"id": "set1_cricket",        "name": "Cricket",        "emoji": "🦗"},
+        {"id": "set1_beetle",         "name": "Beetle",         "emoji": "🪲"},
+        {"id": "set1_mushroom_gnome", "name": "Mushroom Gnome", "emoji": "🍄"},
+        {"id": "set1_cave_bear",      "name": "Cave Bear",      "emoji": "🐻"},
+        {"id": "set1_glowworm",       "name": "Glowworm",       "emoji": "✨"},
+        {"id": "set1_salamander",     "name": "Salamander",     "emoji": "🦎"},
+        {"id": "set1_stalactite",     "name": "Crystal Sprite", "emoji": "💎"}
+      ]
+    },
+    {
+      "id": 2,
+      "theme": "clearing",
+      "animals": [
+        {"id": "set2_butterfly",   "name": "Butterfly",   "emoji": "🦋"},
+        {"id": "set2_bee",         "name": "Bee",         "emoji": "🐝"},
+        {"id": "set2_ladybug",     "name": "Ladybug",     "emoji": "🐞"},
+        {"id": "set2_grasshopper", "name": "Grasshopper", "emoji": "🦗"},
+        {"id": "set2_dragonfly",   "name": "Dragonfly",   "emoji": "🪰"},
+        {"id": "set2_frog",        "name": "Frog",        "emoji": "🐸"},
+        {"id": "set2_duck",        "name": "Duck",        "emoji": "🦆"},
+        {"id": "set2_swan",        "name": "Swan",        "emoji": "🦢"},
+        {"id": "set2_heron",       "name": "Heron",       "emoji": "🦤"},
+        {"id": "set2_stork",       "name": "Stork",       "emoji": "🦩"},
+        {"id": "set2_firefly",     "name": "Firefly",     "emoji": "✨"},
+        {"id": "set2_mantis",      "name": "Mantis",      "emoji": "🦟"},
+        {"id": "set2_caterpillar", "name": "Caterpillar", "emoji": "🐛"},
+        {"id": "set2_snail",       "name": "Snail",       "emoji": "🐌"},
+        {"id": "set2_dove",        "name": "Dove",        "emoji": "🕊"}
+      ]
+    },
+    {
+      "id": 3,
+      "theme": "night",
+      "animals": [
+        {"id": "set3_firefly",     "name": "Firefly",      "emoji": "✨"},
+        {"id": "set3_owl",         "name": "Night Owl",    "emoji": "🦉"},
+        {"id": "set3_wolf",        "name": "Night Wolf",   "emoji": "🐺"},
+        {"id": "set3_panther",     "name": "Panther",      "emoji": "🐆"},
+        {"id": "set3_nighthawk",   "name": "Nighthawk",    "emoji": "🦅"},
+        {"id": "set3_bat_prince",  "name": "Bat Prince",   "emoji": "🦇"},
+        {"id": "set3_shadow_cat",  "name": "Shadow Cat",   "emoji": "🐈"},
+        {"id": "set3_moon_rabbit", "name": "Moon Rabbit",  "emoji": "🐰"},
+        {"id": "set3_star_fox",    "name": "Star Fox",     "emoji": "🦊"},
+        {"id": "set3_luna_moth",   "name": "Luna Moth",    "emoji": "🦋"},
+        {"id": "set3_night_heron", "name": "Night Heron",  "emoji": "🦤"},
+        {"id": "set3_glowbug",     "name": "Glowbug",      "emoji": "💫"},
+        {"id": "set3_dark_deer",   "name": "Dark Deer",    "emoji": "🦌"},
+        {"id": "set3_midnight_bear","name": "Midnight Bear","emoji": "🐻"},
+        {"id": "set3_phantom_bird","name": "Phantom Bird", "emoji": "👻"}
+      ]
+    },
+    {
+      "id": 4,
+      "theme": "underwater",
+      "animals": [
+        {"id": "set4_dolphin",     "name": "Dolphin",      "emoji": "🐬"},
+        {"id": "set4_octopus",     "name": "Octopus",      "emoji": "🐙"},
+        {"id": "set4_seahorse",    "name": "Seahorse",     "emoji": "🦄"},
+        {"id": "set4_jellyfish",   "name": "Jellyfish",    "emoji": "🪼"},
+        {"id": "set4_clownfish",   "name": "Clownfish",    "emoji": "🐠"},
+        {"id": "set4_shark",       "name": "Shark",        "emoji": "🦈"},
+        {"id": "set4_turtle",      "name": "Turtle",       "emoji": "🐢"},
+        {"id": "set4_crab",        "name": "Crab",         "emoji": "🦀"},
+        {"id": "set4_starfish",    "name": "Starfish",     "emoji": "⭐"},
+        {"id": "set4_mermaid_cat", "name": "Mermaid Cat",  "emoji": "🐱"},
+        {"id": "set4_pufferfish",  "name": "Pufferfish",   "emoji": "🐡"},
+        {"id": "set4_anglerfish",  "name": "Anglerfish",   "emoji": "🎣"},
+        {"id": "set4_coral",       "name": "Coral Sprite", "emoji": "🪸"},
+        {"id": "set4_sea_dragon",  "name": "Sea Dragon",   "emoji": "🐲"},
+        {"id": "set4_narwhal",     "name": "Narwhal",      "emoji": "🦄"}
+      ]
+    },
+    {
+      "id": 5,
+      "theme": "volcano",
+      "animals": [
+        {"id": "set5_phoenix",      "name": "Phoenix",       "emoji": "🔥"},
+        {"id": "set5_fire_lizard",  "name": "Fire Lizard",   "emoji": "🦎"},
+        {"id": "set5_lava_toad",    "name": "Lava Toad",     "emoji": "🐸"},
+        {"id": "set5_ember_fox",    "name": "Ember Fox",     "emoji": "🦊"},
+        {"id": "set5_magma_crab",   "name": "Magma Crab",    "emoji": "🦀"},
+        {"id": "set5_ash_wolf",     "name": "Ash Wolf",      "emoji": "🐺"},
+        {"id": "set5_flame_butterfly","name":"Flame Butterfly","emoji":"🦋"},
+        {"id": "set5_volcano_bird", "name": "Volcano Bird",  "emoji": "🦅"},
+        {"id": "set5_obsidian_snake","name":"Obsidian Snake","emoji": "🐍"},
+        {"id": "set5_cinder_bear",  "name": "Cinder Bear",   "emoji": "🐻"},
+        {"id": "set5_heat_sprite",  "name": "Heat Sprite",   "emoji": "✨"},
+        {"id": "set5_smoke_cat",    "name": "Smoke Cat",     "emoji": "🐈"},
+        {"id": "set5_eruption_frog","name": "Eruption Frog", "emoji": "🐸"},
+        {"id": "set5_lava_eel",     "name": "Lava Eel",      "emoji": "🐍"},
+        {"id": "set5_fire_deer",    "name": "Fire Deer",     "emoji": "🦌"}
+      ]
+    },
+    {
+      "id": 6,
+      "theme": "snow",
+      "animals": [
+        {"id": "set6_arctic_fox",   "name": "Arctic Fox",    "emoji": "🦊"},
+        {"id": "set6_polar_bear",   "name": "Polar Bear",    "emoji": "🐻‍❄️"},
+        {"id": "set6_snow_owl",     "name": "Snow Owl",      "emoji": "🦉"},
+        {"id": "set6_ice_rabbit",   "name": "Ice Rabbit",    "emoji": "🐰"},
+        {"id": "set6_penguin",      "name": "Penguin",       "emoji": "🐧"},
+        {"id": "set6_reindeer",     "name": "Reindeer",      "emoji": "🦌"},
+        {"id": "set6_snow_leopard", "name": "Snow Leopard",  "emoji": "🐆"},
+        {"id": "set6_frost_wolf",   "name": "Frost Wolf",    "emoji": "🐺"},
+        {"id": "set6_ice_dragon",   "name": "Ice Dragon",    "emoji": "🐉"},
+        {"id": "set6_blizzard_bird","name": "Blizzard Bird", "emoji": "❄️"},
+        {"id": "set6_tundra_hare",  "name": "Tundra Hare",   "emoji": "🐇"},
+        {"id": "set6_glacier_seal", "name": "Glacier Seal",  "emoji": "🦭"},
+        {"id": "set6_snowflake_fairy","name":"Snowflake Fairy","emoji":"🧚"},
+        {"id": "set6_yeti_cub",     "name": "Yeti Cub",      "emoji": "🐻"},
+        {"id": "set6_crystal_deer", "name": "Crystal Deer",  "emoji": "🦌"}
+      ]
+    },
+    {
+      "id": 7,
+      "theme": "cloud",
+      "animals": [
+        {"id": "set7_cloud_sheep",   "name": "Cloud Sheep",    "emoji": "🐑"},
+        {"id": "set7_sky_whale",     "name": "Sky Whale",      "emoji": "🐋"},
+        {"id": "set7_wind_horse",    "name": "Wind Horse",     "emoji": "🐴"},
+        {"id": "set7_thunder_bird",  "name": "Thunder Bird",   "emoji": "⚡"},
+        {"id": "set7_rainbow_fox",   "name": "Rainbow Fox",    "emoji": "🦊"},
+        {"id": "set7_storm_cat",     "name": "Storm Cat",      "emoji": "🐱"},
+        {"id": "set7_nimbus_rabbit", "name": "Nimbus Rabbit",  "emoji": "🐰"},
+        {"id": "set7_celestial_owl", "name": "Celestial Owl",  "emoji": "🦉"},
+        {"id": "set7_air_dragon",    "name": "Air Dragon",     "emoji": "🐲"},
+        {"id": "set7_cumulus_bear",  "name": "Cumulus Bear",   "emoji": "🐻"},
+        {"id": "set7_breeze_butterfly","name":"Breeze Butterfly","emoji":"🦋"},
+        {"id": "set7_lightning_beetle","name":"Lightning Beetle","emoji":"🪲"},
+        {"id": "set7_gale_wolf",     "name": "Gale Wolf",      "emoji": "🐺"},
+        {"id": "set7_mist_deer",     "name": "Mist Deer",      "emoji": "🦌"},
+        {"id": "set7_cirrus_bird",   "name": "Cirrus Bird",    "emoji": "🕊"}
+      ]
+    },
+    {
+      "id": 8,
+      "theme": "desert",
+      "animals": [
+        {"id": "set8_sand_cat",      "name": "Sand Cat",       "emoji": "🐱"},
+        {"id": "set8_camel",         "name": "Camel",          "emoji": "🐪"},
+        {"id": "set8_desert_fox",    "name": "Desert Fox",     "emoji": "🦊"},
+        {"id": "set8_scorpion_king", "name": "Scorpion King",  "emoji": "🦂"},
+        {"id": "set8_dune_snake",    "name": "Dune Snake",     "emoji": "🐍"},
+        {"id": "set8_oasis_frog",    "name": "Oasis Frog",     "emoji": "🐸"},
+        {"id": "set8_mirage_deer",   "name": "Mirage Deer",    "emoji": "🦌"},
+        {"id": "set8_dust_rabbit",   "name": "Dust Rabbit",    "emoji": "🐰"},
+        {"id": "set8_sun_lizard",    "name": "Sun Lizard",     "emoji": "🦎"},
+        {"id": "set8_cactus_sprite", "name": "Cactus Sprite",  "emoji": "🌵"},
+        {"id": "set8_sandstorm_wolf","name": "Sandstorm Wolf", "emoji": "🐺"},
+        {"id": "set8_heat_owl",      "name": "Heat Owl",       "emoji": "🦉"},
+        {"id": "set8_pyramid_cat",   "name": "Pyramid Cat",    "emoji": "🐈"},
+        {"id": "set8_golden_eagle",  "name": "Golden Eagle",   "emoji": "🦅"},
+        {"id": "set8_desert_tortoise","name":"Desert Tortoise","emoji": "🐢"}
+      ]
+    },
+    {
+      "id": 9,
+      "theme": "haunted",
+      "animals": [
+        {"id": "set9_ghost_cat",      "name": "Ghost Cat",      "emoji": "👻"},
+        {"id": "set9_shadow_wolf",    "name": "Shadow Wolf",    "emoji": "🐺"},
+        {"id": "set9_phantom_deer",   "name": "Phantom Deer",   "emoji": "🦌"},
+        {"id": "set9_spirit_fox",     "name": "Spirit Fox",     "emoji": "🦊"},
+        {"id": "set9_haunted_owl",    "name": "Haunted Owl",    "emoji": "🦉"},
+        {"id": "set9_skeleton_rabbit","name":"Skeleton Rabbit", "emoji": "💀"},
+        {"id": "set9_witch_bear",     "name": "Witch Bear",     "emoji": "🐻"},
+        {"id": "set9_zombie_frog",    "name": "Zombie Frog",    "emoji": "🐸"},
+        {"id": "set9_banshee_bird",   "name": "Banshee Bird",   "emoji": "🦅"},
+        {"id": "set9_specter_snake",  "name": "Specter Snake",  "emoji": "🐍"},
+        {"id": "set9_cursed_butterfly","name":"Cursed Butterfly","emoji":"🦋"},
+        {"id": "set9_demon_lizard",   "name": "Demon Lizard",   "emoji": "🦎"},
+        {"id": "set9_pumpkin_sprite", "name": "Pumpkin Sprite", "emoji": "🎃"},
+        {"id": "set9_graveyard_bat",  "name": "Graveyard Bat",  "emoji": "🦇"},
+        {"id": "set9_wraith_elk",     "name": "Wraith Elk",     "emoji": "🫎"}
+      ]
+    }
+  ]
+}
