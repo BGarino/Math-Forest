@@ -76,8 +76,9 @@ class LeafWidget(Widget):
 
 # ── Rounded menu button ───────────────────────────────────────────────────
 class MenuButton(Button):
-    def __init__(self, btn_color=(0.2, 0.7, 0.3, 1), **kwargs):
-        self._btn_color = btn_color
+    def __init__(self, **kwargs):
+        # MUST pop custom kwarg BEFORE super().__init__()
+        self._btn_color = kwargs.pop('btn_color', (0.2, 0.7, 0.3, 1))
         super().__init__(**kwargs)
         self.background_normal = ''
         self.background_color = (0, 0, 0, 0)
@@ -105,46 +106,65 @@ class MenuButton(Button):
 class CharacterWidget(Widget):
     def __init__(self, gender='princess', **kwargs):
         super().__init__(**kwargs)
+        self.gender = gender
         self.size_hint = (None, None)
         self.size = (int(dp(60)), int(dp(80)))
-        self.gender = gender
         self.bind(pos=self._draw, size=self._draw)
 
     def _draw(self, *_):
         self.canvas.clear()
-        x, y = self.pos
-        w, h = self.size
-        cx = x + w / 2
+        x, y = int(self.x), int(self.y)
+        w, h = int(self.width), int(self.height)
+        cx = x + w // 2
         with self.canvas:
-            # Body color
+            # Body
             if self.gender == 'princess':
-                Color(0.95, 0.55, 0.75, 1)   # pink dress
+                Color(0.95, 0.55, 0.75, 1)
             else:
-                Color(0.35, 0.55, 0.95, 1)   # blue outfit
-            # Body (rounded rect)
-            RoundedRectangle(pos=(cx - dp(14), y), size=(dp(28), dp(38)), radius=[dp(8)])
+                Color(0.35, 0.55, 0.95, 1)
+            RoundedRectangle(
+                pos=(cx - int(dp(14)), y),
+                size=(int(dp(28)), int(dp(38))),
+                radius=[int(dp(8))]
+            )
             # Head
             Color(0.98, 0.85, 0.70, 1)
-            Ellipse(pos=(cx - dp(14), y + dp(38)), size=(dp(28), dp(28)))
+            Ellipse(
+                pos=(cx - int(dp(14)), y + int(dp(38))),
+                size=(int(dp(28)), int(dp(28)))
+            )
             # Hair / crown
             if self.gender == 'princess':
                 Color(0.90, 0.65, 0.10, 1)
-                RoundedRectangle(pos=(cx - dp(14), y + dp(60)), size=(dp(28), dp(10)), radius=[dp(4)])
-                # Crown points
+                RoundedRectangle(
+                    pos=(cx - int(dp(14)), y + int(dp(60))),
+                    size=(int(dp(28)), int(dp(10))),
+                    radius=[int(dp(4))]
+                )
                 Color(1.0, 0.85, 0.0, 1)
-                for ox in [-dp(10), 0, dp(10)]:
-                    RoundedRectangle(pos=(cx + ox - dp(3), y + dp(68)),
-                                     size=(dp(6), dp(10)), radius=[dp(3)])
+                for ox in [-int(dp(10)), 0, int(dp(10))]:
+                    RoundedRectangle(
+                        pos=(cx + ox - int(dp(3)), y + int(dp(68))),
+                        size=(int(dp(6)), int(dp(10))),
+                        radius=[int(dp(3))]
+                    )
             else:
                 Color(0.40, 0.25, 0.10, 1)
-                RoundedRectangle(pos=(cx - dp(14), y + dp(58)), size=(dp(28), dp(12)), radius=[dp(4)])
+                RoundedRectangle(
+                    pos=(cx - int(dp(14)), y + int(dp(58))),
+                    size=(int(dp(28)), int(dp(12))),
+                    radius=[int(dp(4))]
+                )
             # Eyes
             Color(0.1, 0.1, 0.1, 1)
-            Ellipse(pos=(cx - dp(8), y + dp(48)), size=(dp(5), dp(5)))
-            Ellipse(pos=(cx + dp(3), y + dp(48)), size=(dp(5), dp(5)))
+            Ellipse(pos=(cx - int(dp(8)), y + int(dp(48))),
+                    size=(int(dp(5)), int(dp(5))))
+            Ellipse(pos=(cx + int(dp(3)), y + int(dp(48))),
+                    size=(int(dp(5)), int(dp(5))))
             # Smile
             Color(0.6, 0.2, 0.2, 1)
-            Line(circle=(cx, y + dp(43), dp(5), 200, 340), width=dp(1.2))
+            Line(circle=(cx, y + int(dp(43)), int(dp(5)), 200, 340),
+                 width=dp(1.2))
 
 
 # ── Main screen ───────────────────────────────────────────────────────────
@@ -194,7 +214,7 @@ class MainMenuScreen(Screen):
         anim.repeat = True
         anim.start(title)
 
-        # Character widget (drawn, no emoji)
+        # Character widget
         try:
             from kivy.app import App
             gender = App.get_running_app().save.get('gender', 'princess')
@@ -207,7 +227,7 @@ class MainMenuScreen(Screen):
         )
         lay.add_widget(self._char_widget)
 
-        # Bob animation on character
+        # Bob animation
         base_y = int(H * 0.68)
         bob = (Animation(y=base_y + int(dp(8)), duration=1.1) +
                Animation(y=base_y, duration=1.1))
@@ -240,7 +260,7 @@ class MainMenuScreen(Screen):
             btn.bind(on_release=cb)
             lay.add_widget(btn)
 
-        # Diamonds counter (top right)
+        # Diamonds counter
         self._diamond_lbl = Label(
             text='',
             font_size=dp(16),
@@ -259,7 +279,7 @@ class MainMenuScreen(Screen):
         try:
             from kivy.app import App
             d = App.get_running_app().save.get('diamonds', 0)
-            self._diamond_lbl.text = f'<>  {d}'
+            self._diamond_lbl.text = f'<> {d}'
         except Exception:
             pass
 
